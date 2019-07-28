@@ -1,4 +1,4 @@
-# Project: Stock Analysis 
+# Project: Stock Data Analysis 
 
 This repository contains functions written in python to analyse stock data.
 
