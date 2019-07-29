@@ -2,3 +2,4 @@
 api_key_alpha_vantage.txt
 stock_handler_back.py
 .vscode/*
+.gitignore

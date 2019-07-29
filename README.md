@@ -1,5 +1,7 @@
 # Project: Stock Analysis 
 
+![Preview](./preview_small.png)
+
 This repository contains functions written in python to analyse stock data.
 
 ## Getting Started
