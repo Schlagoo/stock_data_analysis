@@ -1,4 +1,4 @@
-# Project: Stock Analysis 
+# Project: Stock Data Analysis 
 
 ![Preview](./preview_small.png)
 
