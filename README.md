@@ -36,8 +36,6 @@ After calling the desired function with all arguments, you can run the script fr
 ./stock_analysis.py
 ~~~
 
-![Example plot: Microsoft](./2019-07-26_msft.png)
-
 ## Built with
 
 * [Python 3.6.8](https://www.python.org/) - Programming language
