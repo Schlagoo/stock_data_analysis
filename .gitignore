@@ -1,5 +1,4 @@
 # Here you can set files, dirs, ... which will not be tracked by git!
 api_key_alpha_vantage.txt
-stock_handler_back.py
 .vscode/*
 .gitignore

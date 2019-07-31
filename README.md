@@ -1,8 +1,8 @@
-# Project: Stock Data Analysis 
+# Project: Automated Stock Data Analysis 
 
 ![Preview](./preview_small.png)
 
-This repository contains functions written in python to analyse stock data.
+This repository contains functions written in python to analyse stock data and retrieve them via e-mail. You can automate running the script by creating a docker image of it (Dockerfile in repository).
 
 ## Getting Started
 
@@ -36,10 +36,26 @@ After calling the desired function with all arguments, you can run the script fr
 ./stock_analysis.py
 ~~~
 
+### Docker
+
+You can automate running this script by building a docker container. Therefore install [docker](https://www.docker.com/) and build an image with following command:
+
+~~~
+docker build ./ -t <img-tag>
+~~~
+
+After building the image, you can run an container instance by:
+
+~~~
+docker run <image-id/-name>
+~~~
+
+
 ## Built with
 
 * [Python 3.6.8](https://www.python.org/) - Programming language
 * [Alpha Vantage](https://www.alphavantage.co/documentation/) - Stock timeseries API
+* [Docker](https://www.docker.com/) - Container Engine
 
 
 ## Author

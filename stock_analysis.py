@@ -9,6 +9,9 @@
     Python:         3.6.7
 """
 
+import os
+import time
+import smtplib
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -17,19 +20,20 @@ from dateutil import parser
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+
 from mpl_finance import candlestick_ohlc
 from alpha_vantage.timeseries import TimeSeries
 
 
 # TODO: Specify aplha_vantage api key to access stock data
-API_KEY = "<API-KEY>"
-# TODO: Define the stock by symbol which sould be requested
-stock_symbol = "MSFT"
+API_KEY = "<PUT API KEY HERE>"
 
 # TODO: Specify t0 and t1 to plot data inbetween!
 today = dt.date.today()
-t0 = today - dt.timedelta(days=3)
-t1 = today + dt.timedelta(days=2)
+t0 = today - dt.timedelta(days=1)
 
 
 def fetch_data(t0, t1, stock_symbol):
@@ -94,7 +98,7 @@ def calculcate_candlestick(current_data, stock_symbol, save_plot):
 
     # Create candlesticks from data
     candlestick_ohlc(ax, zip(data_indexes, current_data["1. open"], current_data["2. high"], 
-    current_data["3. low"], current_data["4. close"]), width=1./(24*60)*4, colorup="g", colordown="r")
+    current_data["3. low"], current_data["4. close"]), width=1./(24*60)*3, colorup="g", colordown="r")
 
     # Plot hours as x-ticks and autoscale
     ax.xaxis_date()
@@ -117,6 +121,80 @@ def calculcate_candlestick(current_data, stock_symbol, save_plot):
     else:
         print("\nError: Wrong save_plot value! Should be 0 or 1 see help() of function!")
 
+    return plot_name
 
-td = fetch_data(t0, t1, stock_symbol)
-calculcate_candlestick(td, stock_symbol, 0)
+
+def send_mail(plot_names):
+
+    """
+    Function to send plot images attached in e-mail.
+    
+    :param  list    plot_names: List with paths to plots
+    """
+
+    # Define message content
+    msg = MIMEMultipart()
+    msg["Subject"] = "Daily summary stocks"
+    msg["From"] = "<sender>"
+    msg["To"] = "<receiver>"
+
+    # Append every plot to e-mail
+    for plot in plot_names:
+        # Read image of current plot
+        img_data = open(plot, "rb").read()
+        image = MIMEImage(img_data, name=os.path.basename(plot))
+        msg.attach(image)
+
+    # Open connection
+    s = smtplib.SMTP("smtp.gmail.com", 587)
+    s.ehlo()
+    # Secure connection
+    s.starttls()
+    s.ehlo()
+    s.login("<e-mail>", "<pw>")
+    s.sendmail(msg["From"], msg["To"], msg.as_string())
+    s.quit()
+
+    print("E-Mail sent!")
+
+
+def main(t0, t1, save_plot):
+
+    """
+    Main function to create plots for defined stocks at specific time.
+    
+    :param  date    t0:             Day before to be analysed time window
+    :param  date    t1:             Day after to be analysed time window
+    :param  date    stock_symbol:   Stock to be analysed by symbol
+    :param  pandas  current_data:   Data of to be analysed frame
+    """
+
+    last_day = ""
+    stocks, plot_names = [], []
+
+    # Read all stocks by symbol into list
+    stocks = open("stocks.txt","r").read().splitlines()
+
+    # Wait until specific time is reached
+    while True:
+        # Get current time in "hour:min"-format
+        t = dt.datetime.now().strftime("%H:%M")
+        # Check if it"s later than 20:00 o"clock (24h time format)
+        if t >= "19:00" and last_day != dt.date.today():
+            print("Starting with creating candlestick graphs!")
+            # Create candlestick plot for every specified stock
+            for stock in stocks:
+                td = fetch_data(t0, t1, stock)
+                pn = calculcate_candlestick(td, stock, save_plot)
+                # Add stock-image path to list
+                plot_names.append(pn)
+            # Send plots via e-mail
+            send_mail(plot_names)
+            last_day = dt.date.today()
+
+        # Sleep 59 seconds before checking again
+        time.sleep(59)
+
+
+if __name__ == "__main__":
+    main(t0, today, 1)
